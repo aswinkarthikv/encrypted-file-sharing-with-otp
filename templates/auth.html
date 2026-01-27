@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 id="form-title" style="margin-bottom: 0.5rem;">Welcome Back</h2>
+        <p class="text-muted">Enter your credentials to access your secure vault.</p>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" required placeholder="name@company.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn" style="width: 100%;">Sign In</button>
+        <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.875rem;">
+            New to FileLockr? <a href="#" onclick="toggleAuth()"
+                style="color: var(--primary-color); text-decoration: none;">Create an account</a>
+        </p>
+    </form>
+
+    <!-- Register Form (Hidden by default) -->
+    <form id="register-form" method="POST" action="{{ url_for('register') }}" style="display: none;">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="name" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" required placeholder="name@company.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required placeholder="Create a strong password">
+        </div>
+        <button type="submit" class="btn" style="width: 100%;">Create Account</button>
+        <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.875rem;">
+            Already have an account? <a href="#" onclick="toggleAuth()"
+                style="color: var(--primary-color); text-decoration: none;">Sign In</a>
+        </p>
+    </form>
+</div>
+
+<script>
+    function toggleAuth() {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const title = document.getElementById('form-title');
+
+        if (loginForm.style.display === 'none') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            title.textContent = 'Welcome Back';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            title.textContent = 'Create Account';
+        }
+    }
+</script>
+{% endblock %}

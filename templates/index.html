@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>Share Files.<br><span>Stay Secure.</span></h1>
+    <p>
+        Military-grade AES-256 encryption combined with OTP verification ensures your
+        sensitive files reach only the intended recipient. No unauthorized access. No data leaks.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('login') }}" class="btn">Start Sharing Securely</a>
+        <a href="#" class="btn btn-outline"
+            style="padding: 0.875rem 2rem; border-radius: 4px; text-decoration: none; font-weight: 600;">How It
+            Works</a>
+    </div>
+</div>
+
+<div class="features" style="display: flex; gap: 2rem; margin-top: 4rem; justify-content: center; flex-wrap: wrap;">
+    <div class="feature-card"
+        style="background: var(--surface-color); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 250px; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary-color);">🛡️</div>
+        <h3 style="font-size: 1.25rem;">AES-256 Encryption</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Files are encrypted before they even hit our servers.
+        </p>
+    </div>
+    <div class="feature-card"
+        style="background: var(--surface-color); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 250px; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary-color);">🔐</div>
+        <h3 style="font-size: 1.25rem;">OTP Verification</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Recipients must verify their identity via OTP.</p>
+    </div>
+    <div class="feature-card"
+        style="background: var(--surface-color); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 250px; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary-color);">⬇️</div>
+        <h3 style="font-size: 1.25rem;">One-Time Download</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Links expire automatically after use for maximum
+            security.</p>
+    </div>
+</div>
+{% endblock %}

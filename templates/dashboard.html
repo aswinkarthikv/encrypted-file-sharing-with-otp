@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container" style="display: flex; gap: 2rem; min-height: calc(100vh - 80px);">
+    <!-- Sidebar -->
+    <aside class="sidebar"
+        style="width: 250px; flex-shrink: 0; background: var(--surface-color); border-right: 1px solid var(--border-color); padding: 2rem 0;">
+        <div style="padding: 0 1.5rem; margin-bottom: 2rem;">
+            <p class="text-muted"
+                style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                Menu</p>
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button onclick="switchTab('files')" id="tab-files" class="nav-item active"
+                    style="text-align: left; background: var(--primary-color); color: #000; border: none; padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; width: 100%;">
+                    📂 My Files
+                </button>
+                <button onclick="switchTab('shares')" id="tab-shares" class="nav-item"
+                    style="text-align: left; background: transparent; color: var(--text-muted); border: none; padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; font-family: inherit; width: 100%; transition: color 0.2s;">
+                    🔗 Shared Links
+                </button>
+            </nav>
+        </div>
+
+        <div style="padding: 0 1.5rem;">
+            <button class="btn" onclick="document.getElementById('upload-modal').style.display='flex'"
+                style="width: 100%;">
+                <span style="margin-right: 0.5rem;">+</span> Upload
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex: 1; padding: 2rem 0;">
+        <div class="header" style="margin-bottom: 2rem;">
+            <h2 id="page-title">My Vault</h2>
+            <p class="text-muted" id="page-subtitle">Manage and share your encrypted files.</p>
+        </div>
+
+        <!-- Files Tab -->
+        <div id="content-files" class="tab-content">
+            <div class="file-grid">
+                {% if files %}
+                {% for file in files %}
+                <div class="file-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                        <div class="file-icon"
+                            style="font-size: 2.5rem; background: rgba(0, 189, 126, 0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: var(--primary-color);">
+                            📄
+                        </div>
+                        <span
+                            style="font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.25rem 0.5rem; border-radius: 4px;">AES-256</span>
+                    </div>
+
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                        title="{{ file.filename }}">{{ file.filename }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Uploaded: {{
+                        file.upload_time.strftime('%b %d, %Y') }}</p>
+
+                    <div class="file-actions" style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 0.75rem;"
+                            onclick="openShareModal('{{ file.id }}', '{{ file.filename }}')">Share Link</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state"
+                    style="grid-column: 1/-1; text-align: center; padding: 6rem; background: var(--surface-color); border-radius: 8px; border: 1px dashed var(--border-color);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">📂</div>
+                    <h3 style="margin-bottom: 0.5rem;">No files in your vault</h3>
+                    <p class="text-muted" style="margin-bottom: 2rem;">Upload a file to get started with secure sharing.
+                    </p>
+                    <button class="btn btn-outline"
+                        onclick="document.getElementById('upload-modal').style.display='flex'">Upload First
+                        File</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Shared Links Tab -->
+        <div id="content-shares" class="tab-content" style="display: none;">
+            <div
+                style="background: var(--surface-color); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; color: var(--text-color);">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                            <th style="padding: 1rem; color: var(--text-muted); font-weight: 500;">File</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-weight: 500;">Recipient</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-weight: 500;">Link</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-weight: 500;">OTP (Dev)</th>
+                            <th style="padding: 1rem; color: var(--text-muted); font-weight: 500;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if shares %}
+                        {% for share in shares %}
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 1rem;">{{ share.file.filename }}</td>
+                            <td style="padding: 1rem;">{{ share.receiver_email }}</td>
+                            <td style="padding: 1rem;">
+                                <a href="{{ url_for('download_auth', token=share.token) }}" target="_blank"
+                                    style="color: var(--primary-color);">Open Link ↗</a>
+                            </td>
+                            <td style="padding: 1rem; font-family: monospace;">
+                                {% if share.otps %}
+                                {{ share.otps[-1].otp_code }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem;">
+                                {% if share.otps and share.otps[-1].is_used %}
+                                <span style="color: var(--text-muted);">Downloaded</span>
+                                {% else %}
+                                <span style="color: var(--primary-color);">Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                                No active shared links found.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Upload Modal -->
+<div id="upload-modal" class="modal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal-content"
+        style="padding: 2.5rem; border-radius: 12px; max-width: 500px; width: 90%; position: relative;">
+        <h3 style="margin-bottom: 0.5rem;">Upload Secure File</h3>
+        <p class="text-muted" style="margin-bottom: 2rem;">File will be encrypted immediately upon selection.</p>
+
+        <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group"
+                style="background: #000; border: 2px dashed var(--border-color); padding: 2rem; text-align: center; border-radius: 8px; cursor: pointer; transition: border-color 0.2s;"
+                onclick="document.getElementById('file-input').click()">
+                <input type="file" name="file" id="file-input" required style="display: none;"
+                    onchange="updateFileName(this)">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📤</div>
+                <p id="file-name-display" style="color: var(--text-muted);">Click to browse files</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" class="btn btn-outline"
+                    onclick="document.getElementById('upload-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn">Encrypt & Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div id="share-modal" class="modal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; align-items: center; justify-content: center;">
+    <div class="modal-content" style="padding: 2.5rem; border-radius: 12px; max-width: 500px; width: 90%;">
+        <h3 style="margin-bottom: 0.5rem;">Share File securely</h3>
+        <p id="share-file-name" class="text-muted" style="margin-bottom: 2rem;"></p>
+
+        <form action="{{ url_for('share_file') }}" method="POST">
+            <input type="hidden" name="file_id" id="share-file-id">
+            <div class="form-group">
+                <label>Receiver Email</label>
+                <input type="email" name="email" required placeholder="recipient@example.com">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    We will never share this email. It is used only for OTP verification.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" class="btn btn-outline"
+                    onclick="document.getElementById('share-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn">Generate Secure Link</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openShareModal(fileId, fileName) {
+        document.getElementById('share-modal').style.display = 'flex';
+        document.getElementById('share-file-id').value = fileId;
+        document.getElementById('share-file-name').innerText = 'Sharing: ' + fileName;
+    }
+
+    function updateFileName(input) {
+        const display = document.getElementById('file-name-display');
+        if (input.files && input.files.length > 0) {
+            display.innerText = input.files[0].name;
+            display.style.color = 'var(--text-color)';
+        } else {
+            display.innerText = 'Click to browse files';
+            display.style.color = 'var(--text-muted)';
+        }
+    }
+
+    function switchTab(tabName) {
+        // Hide all contents
+        document.getElementById('content-files').style.display = 'none';
+        document.getElementById('content-shares').style.display = 'none';
+
+        // Reset nav styles
+        document.getElementById('tab-files').style.background = 'transparent';
+        document.getElementById('tab-files').style.color = 'var(--text-muted)';
+        document.getElementById('tab-shares').style.background = 'transparent';
+        document.getElementById('tab-shares').style.color = 'var(--text-muted)';
+
+        // Activate selected
+        document.getElementById('content-' + tabName).style.display = 'block';
+        const activeTab = document.getElementById('tab-' + tabName);
+        activeTab.style.background = 'var(--primary-color)';
+        activeTab.style.color = '#000';
+
+        // Update Title
+        if (tabName === 'files') {
+            document.getElementById('page-title').innerText = 'My Vault';
+            document.getElementById('page-subtitle').innerText = 'Manage and share your encrypted files.';
+        } else {
+            document.getElementById('page-title').innerText = 'Shared Links';
+            document.getElementById('page-subtitle').innerText = 'Monitor your active secure links.';
+        }
+    }
+
+    // Close modals on outside click
+    window.onclick = function (event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}
