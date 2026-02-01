@@ -151,6 +151,19 @@ verify_migration.py
 
 ---
 
+## ⚙️ Installation & Setup (Local)
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/USERNAME/secure-file-sharing.git
+cd secure-file-sharing
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+
+---
+
 ## 🚀 Future Enhancements
 
 * Real email/SMS OTP integration
