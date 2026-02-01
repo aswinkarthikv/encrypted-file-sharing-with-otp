@@ -181,6 +181,10 @@ python app.py
 🎓 Computer Science and Engineering
 📧 [aswinkarthikv@gmail.com](mailto:aswinkarthikv@gmail.com)
 
+**Niranjani A**
+🎓 Computer Science and Engineering
+📧 [niranjania@gmail.com](mailto:niranjania@gmail.com)
+
 ---
 
 ## 📜 License
