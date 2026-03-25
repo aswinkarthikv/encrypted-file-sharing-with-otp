@@ -155,8 +155,8 @@ verify_migration.py
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/USERNAME/secure-file-sharing.git
-cd secure-file-sharing
+git clone https://github.com/aswinkarthikv/encrypted-file-sharing-with-otp.git
+cd encrypted-file-sharing-with-otp
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
